@@ -1,44 +1,27 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TouchableOpacity, Pressable } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Pressable, Button } from 'react-native';
+import {NavigationContainer} from '@react-navigation/native';
 import React, { useState } from 'react'
 import Ionicons from '@expo/vector-icons/Ionicons' ;
-import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
-import FontAwesome from '@expo/vector-icons/FontAwesome' ;
-import EvilIcons from '@expo/vector-icons/EvilIcons' ;
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import HomeScreen from './pages/HomeScreen';
+import CalendarScreen from './pages/CalendarScreen';
+import UploadScreen from './pages/UploadScreen';
+import AlbumsScreen from './pages/AlbumsScreen';
+import ProfileScreen from './pages/ProfileScreen';
 
-export default function App() {
-  const press = () => {
-    console.log('Button pressed');
-  }
-  return (
-    <View style={styles.container}>
-      <Text style={styles.home}><ColorChangingButton defaultIconName="shirt-outline" pressedIconName="shirt" iconSize={40} onPress={press} /></Text>
-      <Text style={styles.calendar}><ColorChangingButton defaultIconName="calendar-clear-outline" pressedIconName="calendar-clear" iconSize={40} onPress={press}/> </Text>
-      <Text style={styles.plus}><ColorChangingButton defaultIconName="add-circle-outline" pressedIconName="add-circle" iconSize={40} onPress={press} /></Text>
-      <Text style={styles.album}><ColorChangingButton defaultIconName="albums-outline" pressedIconName="albums" iconSize={40} onPress={press} /></Text>
-      <Text style={styles.profile}><ColorChangingButton defaultIconName="person-outline" pressedIconName="person" iconSize={40} onPress={press} /></Text>
-      <Text style={styles.dice}><ColorChangingButton defaultIconName="dice-outline" pressedIconName="dice" iconSize={40} onPress={press} /></Text>
-      <Text style={styles.text}>Fitted</Text>
-      <View style={styles.horizontalLine} />
-      <View style={styles.topLine} />
-      <StatusBar style="auto" />
-    
-    </View>
-  );
- 
-
-}
+const Tab = createBottomTabNavigator();
 
 // function for button to change when being pressed
 const ColorChangingButton = ({ defaultIconName, pressedIconName, iconSize = 40, onPress }) => {
-  const [iconName, setIconName] = useState(defaultIconName);  // initial icon is set to default
+  const [iconName, setIconName] = useState(defaultIconName);  
 
   const pressed = () => {
-    setIconName(pressedIconName);  // change to the dark icon when the button is pressed
+    setIconName(pressedIconName);  
   };
 
   const unPressed = () => {
-    setIconName(defaultIconName);  // go back to the outline icon when the button is released
+    setIconName(defaultIconName);  
   };
 
   return (
@@ -52,7 +35,96 @@ const ColorChangingButton = ({ defaultIconName, pressedIconName, iconSize = 40, 
   );
 };
 
+function CustomHeader({ navigation }) {
+  return (
+    <View style={styles.header}>
+      <Text style={styles.title}>Fitted</Text>
+      <ColorChangingButton
+        defaultIconName="dice-outline"
+        pressedIconName="dice"
+        onPress={() => console.log('Shuffle button pressed')}
+      />
+    </View>
+  );
+}
+
+export default function App() {
+  return (
+    <NavigationContainer>
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          tabBarIcon: ({ focused, color, size }) => {
+            let iconName;
+
+            if (route.name === 'Home') {
+              iconName = focused
+                ? "shirt"
+                : "shirt-outline";
+            }
+            if (route.name === 'Calendar') {
+              iconName = focused 
+              ? "calendar-clear" 
+              : "calendar-clear-outline";
+            }
+            if (route.name === 'Upload') {
+              iconName = focused 
+              ? "add-circle" 
+              : "add-circle-outline";
+            }
+            if (route.name === 'Albums') {
+              iconName = focused 
+              ? "albums" 
+              : "albums-outline";
+            }
+            if (route.name === 'Profile') {
+              iconName = focused 
+              ? "person" 
+              : "person-outline";
+            }
+
+            return <Ionicons name={iconName} size={size} color={color} />;
+          },
+          tabBarActiveTintColor: "#800f2f",
+          tabBarInactiveTintColor: "#6c757d",
+        })}
+      >
+        <Tab.Screen 
+          name="Home" 
+          component={HomeScreen} 
+          options={{
+            header: () => <CustomHeader />,
+            headerStyle: {
+              backgroundColor: 'white', 
+              elevation: 0, 
+              shadowOpacity: 0,
+            },
+          }} 
+        />
+        <Tab.Screen name="Calendar" component={CalendarScreen} />
+        <Tab.Screen name="Upload" component={UploadScreen} />
+        <Tab.Screen name="Albums" component={AlbumsScreen} />
+        <Tab.Screen name="Profile" component={ProfileScreen} />
+      </Tab.Navigator>
+    </NavigationContainer>
+  );
+}
+
+
 const styles = StyleSheet.create({
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    height: 98, 
+    paddingHorizontal: 15,
+    backgroundColor: 'white', 
+    elevation: 1,
+    borderBottomWidth: 0.3,
+    borderBottomColor: '#ccc',
+  },
+  title: {
+    fontSize: 40, 
+  },
   container: {
     flex: 1,
     backgroundColor: '#fff',

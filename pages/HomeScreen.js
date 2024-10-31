@@ -2,7 +2,6 @@ import React from 'react';
 import { ScrollView, View, Text, Image, StyleSheet } from 'react-native';
 
 const HomeScreen = () => {
-  // Sample data with local PNG images
   const shirts = [
     { id: 1, uri: require('../uploads/shirt1.png') },
     { id: 2, uri: require('../uploads/shirt2.png') },
@@ -28,7 +27,7 @@ const HomeScreen = () => {
           {shirts.map((shirt) => (
             <Image
               key={shirt.id}
-              source={shirt.uri} // Use the require path
+              source={shirt.uri}
               style={styles.shirts}
             />
           ))}
@@ -39,7 +38,7 @@ const HomeScreen = () => {
           {pants.map((pant) => (
             <Image
               key={pant.id}
-              source={pant.uri} // Use the require path
+              source={pant.uri} 
               style={styles.pants}
             />
           ))}
@@ -51,7 +50,7 @@ const HomeScreen = () => {
           {shoes.map((shoe) => (
             <Image
               key={shoe.id}
-              source={shoe.uri} // Use the require path
+              source={shoe.uri} 
               style={styles.shoes}
             />
           ))}

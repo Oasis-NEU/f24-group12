@@ -10,6 +10,7 @@ import UploadScreen from './pages/UploadScreen';
 import AlbumsScreen from './pages/AlbumsScreen';
 import ProfileScreen from './pages/ProfileScreen';
 
+
 const Tab = createBottomTabNavigator();
 
 // function for button to change when being pressed

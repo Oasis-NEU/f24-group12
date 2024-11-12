@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { View, Button, Image, StyleSheet, Alert } from 'react-native';
-import * as ImagePicker from 'expo-image-picker'; // Import from expo-image-picker
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = 'https://wvqofttxahchtirsvngy.supabase.co'; // Your Supabase URL
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind2cW9mdHR4YWhjaHRpcnN2bmd5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjk0NDI1NjUsImV4cCI6MjA0NTAxODU2NX0.cEJ3xPVbysvrysTnYaxZTGN0LX89YxcNXLGcGGw6wfI';
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+import * as ImagePicker from 'expo-image-picker';
+import { decode } from 'base64-arraybuffer'; // import base64-arraybuffer for decoding base64
+import supabase from './supabase-service'; 
+import { removeBackground } from 'react-native-background-remover';
 
 const UploadPage = () => {
     const [imageUri, setImageUri] = useState(null);
 
+    // request camera permissions
     const requestCameraPermissions = async () => {
         const { status } = await ImagePicker.requestCameraPermissionsAsync();
         if (status !== 'granted') {
@@ -17,39 +16,60 @@ const UploadPage = () => {
         }
     };
 
+    // request permissions on component mount
     useEffect(() => {
         requestCameraPermissions();
     }, []);
- 
 
-    const uploadPhoto = async () => {
-        const options = {
-            mediaTypes: ImagePicker.MediaTypeOptions.All,
-            quality: 1,
-        };
+    // function to launch the camera and take a picture
+    const takePhoto = async () => {
+        try {
+            const options = {
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                quality: 1,
+                base64: true,
+            };
 
-        const response = await ImagePicker.launchCameraAsync(options);
-        
-        if (!response.canceled) {
-            setImageUri(response.uri);
-            
-            const imageData = await fetch(response.uri);
-            const blob = await imageData.blob();
-            const filePath = `uploads/${response.uri.split('/').pop()}`; // Get the file name
-            
-            const { data, error } = await supabase.storage.from('clothing-photos').upload(filePath, blob);
+            const response = await ImagePicker.launchCameraAsync(options);
 
-            if (error) {
-                Alert.alert('Error uploading image:', error.message);
-            } else {
-                Alert.alert('Image uploaded successfully!');
+            // if the user didn't cancel, set the image uri to display it
+            if (!response.canceled && response.assets && response.assets.length > 0) {
+                const base64Data = response.assets[0].base64; // get the base64 data
+                const uri = response.assets[0].uri;
+                setImageUri(uri); // access the uri from the assets array
+                const fileName = uri.split('/').pop(); // get the file name from the uri
+
+
+                // decode the base64 string to an arraybuffer
+                const decodedData = decode(base64Data);
+
+                // get the file type (extension) from the uri
+                const fileType = uri.split('.').pop();
+                const contentType = `image/${fileType}`;
+
+                // upload the decoded image data to supabase storage
+                const { data, error } = await supabase.storage
+                    .from("uploads")
+                    .upload(fileName, decodedData, {
+                        contentType, // set mime type
+                        cacheControl: '3600',
+                        upsert: false,
+                    });
+
+                if (error) {
+                    Alert.alert('Upload failed!', error.message);
+                } else {
+                    Alert.alert('Upload successful!');
+                }
             }
+        } catch (error) {
+            Alert.alert('Error', 'Something went wrong while uploading the photo.');
         }
     };
 
     return (
         <View style={styles.container}>
-            <Button title="Take a Picture" onPress={uploadPhoto} />
+            <Button title="Take a Picture" onPress={takePhoto} />
             {imageUri && <Image source={{ uri: imageUri }} style={styles.image} />}
         </View>
     );

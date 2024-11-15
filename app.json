@@ -31,7 +31,11 @@
   ],
   
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true, 
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app needs access to your camera",
+        "NSPhotoLibraryUsageDescription": "This app needs access to your photo library"
+      }
     },
     "android": {
       "adaptiveIcon": {

@@ -9,8 +9,9 @@ import CalendarScreen from './pages/CalendarScreen';
 import UploadScreen from './pages/UploadScreen';
 import AlbumsScreen from './pages/AlbumsScreen';
 import ProfileScreen from './pages/ProfileScreen';
+import MyAgenda from './pages/MyAgenda';
 
-
+import AppNavigator from './pages/AppNavigator';
 const Tab = createBottomTabNavigator();
 
 // function for button to change when being pressed
@@ -107,6 +108,7 @@ export default function App() {
         <Tab.Screen name="Profile" component={ProfileScreen} />
       </Tab.Navigator>
     </NavigationContainer>
+    
   );
 }
 

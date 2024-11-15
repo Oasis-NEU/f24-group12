@@ -1,9 +1,13 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, SafeAreaView, Button, Image } from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView, Button, Image, Permissions } from 'react-native';
 import { useEffect, useRef, useState } from 'react';
 import { Camera } from 'expo-camera';
 import { shareAsync } from 'expo-sharing';
 import * as MediaLibrary from 'expo-media-library';
+// import * as Permissions from "expo-permissions"
+import { requestCameraPermissionsAsync } from 'expo-image-picker';
+
+import * as ImagePicker from 'expo-image-picker';
 
 
 export default function UploadScreen() {
@@ -11,7 +15,7 @@ export default function UploadScreen() {
   let cameraRef = useRef();
   const [hasCameraPermission, setHasCameraPermission] = useState();
   const [hasMediaLibraryPermission, setHasMediaLibraryPermission] = useState();
-  const [photo, setPhoto] = useState();
+  const [photo, setPhoto] = useState(null);
 
   useEffect(() => {
     (async () => {
@@ -21,6 +25,7 @@ export default function UploadScreen() {
       setHasMediaLibraryPermission(mediaLibraryPermission.status === "granted");
     })();
   }, []);
+  
 
   if (hasCameraPermission === undefined) {
     return <Text>Requesting permissions...</Text>
